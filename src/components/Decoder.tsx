@@ -37,7 +37,9 @@ export default function Decoder({ onStageFound, demoNonce }: { onStageFound: (id
       }
       setResult(out);
       setBusy(false);
-      onStageFound(out.mappedStageId);
+      // Out-of-scope docs (e.g. High Court) must not silently drive the District
+      // journey state — identification only, no stage mutation.
+      if (!out.scopeNoteEn) onStageFound(out.mappedStageId);
       // AI layers (grounded in the deterministic extraction). Offline path stays fully usable.
       const stage = STAGES.find((s) => s.id === out.mappedStageId);
       const corpus = [
@@ -195,13 +197,19 @@ export default function Decoder({ onStageFound, demoNonce }: { onStageFound: (id
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-300/15 px-3 py-1.5 text-[11.5px] font-bold text-emerald-200">
                     <BadgeCheck size={13} /> Appears to be: {result.docType} · {result.docTypeConfidence} signal
                   </span>
-                  <span className="rounded-full bg-[#C9A227]/15 px-3 py-1.5 text-[11.5px] font-bold text-[#f3d67a]">
-                    {lang === "en" ? "Maps to journey stage → " : "यात्रा-चरण → "}
-                    {(() => {
-                      const st = STAGES.find((s) => s.id === result.mappedStageId);
-                      return st ? (lang === "en" ? st.titleEn : st.titleHi) : result.mappedStageId;
-                    })()}
-                  </span>
+                  {result.scopeNoteEn ? (
+                    <span className="rounded-full bg-red-300/15 px-3 py-1.5 text-[11.5px] font-bold text-red-200">
+                      {lang === "en" ? "Journey mapping disabled — outside V1 support" : "यात्रा-मैपिंग निष्क्रिय — V1 दायरे से बाहर"}
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-[#C9A227]/15 px-3 py-1.5 text-[11.5px] font-bold text-[#f3d67a]">
+                      {lang === "en" ? "Maps to journey stage → " : "यात्रा-चरण → "}
+                      {(() => {
+                        const st = STAGES.find((s) => s.id === result.mappedStageId);
+                        return st ? (lang === "en" ? st.titleEn : st.titleHi) : result.mappedStageId;
+                      })()}
+                    </span>
+                  )}
                 </div>
                 {(lang === "en" ? result.signalsEn : result.signalsHi).length > 0 && (
                   <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
@@ -291,11 +299,23 @@ export default function Decoder({ onStageFound, demoNonce }: { onStageFound: (id
                   )}
                 </details>
                 <div className="rounded-2xl border border-[#C9A227]/30 bg-[#C9A227]/8 p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#f3d67a]">What appears to happen next</p>
-                  <p className="mt-1.5 text-[13.5px] text-white/85">{lang === "en" ? result.nextEn : result.nextHi}</p>
-                  <a href="#checklist" className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-[12px] font-bold text-white transition hover:bg-white/20">
-                    <ListChecks size={13} /> Checklist updated for this stage ↓
-                  </a>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#f3d67a]">
+                    {result.scopeNoteEn ? (lang === "en" ? "Next step for this document" : "इस दस्तावेज़ हेतु अगला चरण") : lang === "en" ? "What appears to happen next" : "आगे क्या होने का संकेत"}
+                  </p>
+                  {result.scopeNoteEn ? (
+                    <p className="mt-1.5 text-[13.5px] text-white/85">
+                      {lang === "en"
+                        ? "Not provided. V1 gives actionable next steps only for MP District Court matters. Confirm the procedure with this court's registry or a lawyer."
+                        : "नहीं दिया गया। V1 व्यवहार्य अगला चरण केवल म.प्र. जिला न्यायालय मामलों हेतु देता है। इस न्यायालय की प्रक्रिया रजिस्ट्री या अधिवक्ता से पुष्ट करें।"}
+                    </p>
+                  ) : (
+                    <>
+                      <p className="mt-1.5 text-[13.5px] text-white/85">{lang === "en" ? result.nextEn : result.nextHi}</p>
+                      <a href="#checklist" className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-[12px] font-bold text-white transition hover:bg-white/20">
+                        <ListChecks size={13} /> Checklist updated for this stage ↓
+                      </a>
+                    </>
+                  )}
                 </div>
                 <div className="rounded-2xl border border-white/10 p-4">
                   <p className="text-[11px] font-bold uppercase tracking-widest text-white/45">Cannot safely be inferred</p>

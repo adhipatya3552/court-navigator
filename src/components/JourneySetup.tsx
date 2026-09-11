@@ -102,6 +102,7 @@ export default function JourneySetup({
           </div>
           {STAGES.map((s, i) => {
             const active = s.id === stageId;
+            const isLoop = s.id === "next-stage";
             return (
               <motion.button
                 key={s.id}
@@ -111,19 +112,26 @@ export default function JourneySetup({
                 transition={{ duration: 0.45, delay: i * 0.05 }}
                 onClick={() => setStageId(s.id)}
                 className={`group rounded-2xl border p-4 text-left transition-all duration-300 hover:-translate-y-1 ${
-                  active
-                    ? "border-[#C9A227] bg-gradient-to-br from-[#fff8e1] to-white shadow-[0_16px_40px_rgba(201,162,39,0.25)]"
-                    : "border-[#101828]/10 bg-[#FAF8F3] hover:border-[#0E4D4A]/40 hover:shadow-lg"
+                  isLoop
+                    ? "border-dashed border-[#0E4D4A]/45 bg-[#0E4D4A]/[0.04] hover:border-[#0E4D4A]/70 hover:shadow-lg"
+                    : active
+                      ? "border-[#C9A227] bg-gradient-to-br from-[#fff8e1] to-white shadow-[0_16px_40px_rgba(201,162,39,0.25)]"
+                      : "border-[#101828]/10 bg-[#FAF8F3] hover:border-[#0E4D4A]/40 hover:shadow-lg"
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className={`grid h-8 w-8 place-items-center rounded-xl text-[13px] font-black ${active ? "bg-[#101828] text-[#f3d67a]" : "bg-[#101828]/8 text-[#101828]/60"}`}>
-                    {s.order}
+                  <span className={`grid h-8 w-8 place-items-center rounded-xl text-[13px] font-black ${isLoop ? "bg-[#0E4D4A]/10 text-[#0E4D4A]" : active ? "bg-[#101828] text-[#f3d67a]" : "bg-[#101828]/8 text-[#101828]/60"}`}>
+                    {isLoop ? "↻" : s.order}
                   </span>
                   {active && <span className="rounded-full bg-[#101828] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#f3d67a]">{t("stage.youAreHere")}</span>}
                 </div>
                 <div className="mt-3 text-[15px] font-bold text-[#101828]">{lang === "en" ? s.titleEn : s.titleHi}</div>
                 <div className="mt-1 text-[13px] leading-relaxed text-[#101828]/60">{lang === "en" ? s.taglineEn : s.taglineHi}</div>
+                {isLoop && (
+                  <div className="mt-2 inline-block rounded-full bg-[#0E4D4A]/10 px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wider text-[#0E4D4A]">
+                    {lang === "en" ? "↻ loops back to Listing" : "↻ लिस्टिंग पर वापसी"}
+                  </div>
+                )}
               </motion.button>
             );
           })}

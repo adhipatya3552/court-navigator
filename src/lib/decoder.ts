@@ -48,23 +48,35 @@ export function decodeDocument(rawText: string): DecodedDoc | { error: string } 
   const signalsEn: string[] = [];
   const signalsHi: string[] = [];
 
+  // Document-type detection via structural signals, not one keyword position.
+  const hasOrderLine = /(^|\n)\s*order\b/i.test(text);
+  const hasOrderWord = includesWord(lower, "order");
+  const decisionish = /(is allowed|is dismissed|is withdrawn|stands? disposed of|is disposed of|is granted|released on bail)/.test(lower);
+  const judgeLine = /before\s+[^\n]{0,70}justice/i.test(text);
+  const isNotice = includesWord(lower, "notice") && includesWord(lower, "appear");
+  const isSummons = includesWord(lower, "summons");
+
   let docType: DecodedDoc["docType"] = "unidentified";
   let conf: DecodedDoc["docTypeConfidence"] = "low";
-  if (/(^|\n)\s*order\b/.test(lower) || includesWord(lower, "order") && includesWord(lower, "heard")) {
+  const orderReasons: string[] = [];
+  if (hasOrderLine) orderReasons.push("a line beginning with “ORDER”");
+  if (hasOrderWord && decisionish) orderReasons.push("“order” alongside decision wording (allowed/disposed/withdrawn)");
+  if (judgeLine && (hasOrderWord || decisionish)) orderReasons.push("a judge header with order/decision wording");
+  if (/(high court|sessions? court|in the court of|district court)/.test(lower) && decisionish && hasOrderWord)
+    orderReasons.push("court header with an order and a decision");
+  // Notices usually end “By order of the Court” — an isolated “order” must not
+  // outvote a clear notice+appear structure when there is no ORDER line.
+  if (orderReasons.length > 0 && !(isNotice && !hasOrderLine && !decisionish)) {
     docType = "order";
-    conf = lower.includes("demo document") || lower.includes("order") ? "medium" : "low";
-    signalsEn.push(`Treated as an order because the text contains “order” near “heard”.`);
-    signalsHi.push(`पाठ में “order” व “heard” होने से इसे आदेश माना गया।`);
-  }
-  if (includesWord(lower, "notice") && includesWord(lower, "appear")) {
-    docType = docType === "order" ? docType : "notice";
-    if (docType === "notice") {
-      conf = "medium";
-      signalsEn.push(`Treated as a notice because the text asks someone to “appear”.`);
-      signalsHi.push(`पाठ में “appear” होने से इसे नोटिस माना गया।`);
-    }
-  }
-  if (includesWord(lower, "summons")) {
+    conf = "medium";
+    signalsEn.push(`Treated as an order because of ${orderReasons.join(" and ")}.`);
+    signalsHi.push(`आदेश माना गया, कारण: ${orderReasons.join(" और ")}।`);
+  } else if (isNotice) {
+    docType = "notice";
+    conf = "medium";
+    signalsEn.push(`Treated as a notice because the text asks someone to “appear”.`);
+    signalsHi.push(`पाठ में “appear” होने से इसे नोटिस माना गया।`);
+  } else if (isSummons) {
     docType = "summons";
     conf = "medium";
     signalsEn.push(`Treated as summons because the word “summons” appears.`);
@@ -117,15 +129,16 @@ export function decodeDocument(rawText: string): DecodedDoc | { error: string } 
     mappedStageId = "order";
     mapSignal("Word “adjourned” records what the court directed → mapped to Order.", "“adjourned” शब्द न्यायालयीन निर्देश दर्शाता है → आदेश से जोड़ा गया।");
   }
-  if (includesWord(lower, "defect") || includesWord(lower, "objection")) {
+  // "No objection" is cooperation, not a registry objection — lookbehind guards it.
+  if (/(^|\s)defects?($|\s)/.test(lower) || /registry\s+objection/.test(lower) || /(?<!\bno\s+)\bobjections?\b/.test(lower)) {
     mappedStageId = "scrutiny";
-    mapSignal("Words “defect/objection” come from the registry → mapped to Scrutiny.", "“defect/objection” शब्द रजिस्ट्री से आते हैं → जांच से जोड़ा गया।");
+    mapSignal("Registry-style “defect” or a real “objection” (not “no objection”) → mapped to Scrutiny.", "रजिस्ट्री-शैली “defect” या वास्तविक “objection” (“no objection” नहीं) → जांच से जोड़ा गया।");
   }
   // A granted/disposed order records the court's decision → Order, even when the
   // text also narrates earlier hearing language. Placed last so it wins ties.
-  if (docType === "order" && /(application[^.]{0,80}is\s+allowed|stands?\s+disposed\s+of|bail application[^.]{0,80}is\s+allowed)/.test(lower)) {
+  if (docType === "order" && /(application[^.]{0,90}is\s+(allowed|dismissed)|stands?\s+disposed\s+of|is\s+disposed\s+of|is\s+withdrawn)/.test(lower)) {
     mappedStageId = "order";
-    mapSignal("Phrases like “application is allowed / stands disposed of” record a decision → mapped to Order.", "“allowed / disposed of” जैसे वाक्य निर्णय दर्शाते हैं → आदेश से जोड़ा गया।");
+    mapSignal("Phrases like “application is allowed / disposed of / withdrawn” record a decision → mapped to Order.", "“allowed / disposed of / withdrawn” जैसे वाक्य निर्णय दर्शाते हैं → आदेश से जोड़ा गया।");
   }
 
   // Jurisdiction honesty: High Court / Supreme Court documents fall outside the
@@ -152,6 +165,13 @@ export function decodeDocument(rawText: string): DecodedDoc | { error: string } 
   const typeLabelHi =
     docType === "order" ? "न्यायालयीन आदेश" : docType === "notice" ? "न्यायालयीन नोटिस" : docType === "summons" ? "सम्मन" : "न्यायालयीन दस्तावेज़";
 
+  const journeyLineEn = scopeNoteEn
+    ? "Identification only — the document falls outside the V1 journey, so no journey placement is asserted."
+    : `It appears to relate to the “${stage.titleEn}” part of the journey. Please verify with the current court record.`;
+  const journeyLineHi = scopeNoteHi
+    ? "केवल पहचान — दस्तावेज़ V1 यात्रा से बाहर है, इसलिए कोई यात्रा-स्थान नहीं बताया जा रहा।"
+    : `यह यात्रा के “${stage.titleHi}” चरण से संबंधित प्रतीत होता है। वर्तमान न्यायालयीन रिकॉर्ड से सत्यापित करें।`;
+
   const summaryEn =
     docType === "unidentified"
       ? "Based on the text provided, this appears to be a court-related document, but its exact type cannot be safely identified. Please verify against the original signed copy."
@@ -159,13 +179,13 @@ export function decodeDocument(rawText: string): DecodedDoc | { error: string } 
         (dates.length > 0
           ? `It mentions ${dates.length === 1 ? "a date" : "dates"} (${dates.slice(0, 3).join(", ")}). `
           : "No clear hearing date could be extracted — check the original for dates. ") +
-        `It appears to relate to the “${stage.titleEn}” part of the journey. Please verify with the current court record.`;
+        journeyLineEn;
   const summaryHi =
     docType === "unidentified"
       ? "दिए गए पाठ के आधार पर यह न्यायालयीन दस्तावेज़ प्रतीत होता है, पर सटीक प्रकार सुरक्षित रूप से पहचाना नहीं जा सका। मूल हस्ताक्षरित प्रति से जांचें।"
       : `दिए गए पाठ के आधार पर यह ${typeLabelHi} प्रतीत होता है। ` +
         (dates.length > 0 ? `इसमें तारीख उल्लिखित है (${dates.slice(0, 3).join(", ")})। ` : "स्पष्ट तारीख नहीं मिली — मूल प्रति में तारीख जांचें। ") +
-        `यह यात्रा के “${stage.titleHi}” चरण से संबंधित प्रतीत होता है। वर्तमान न्यायालयीन रिकॉर्ड से सत्यापित करें।`;
+        journeyLineHi;
 
   const unknownsEn: string[] = [];
   const unknownsHi: string[] = [];

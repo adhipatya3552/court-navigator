@@ -35,6 +35,15 @@ describe("resolveNext", () => {
     assert.equal(r.nextStageId, "next-stage");
   });
 
+  it("listing advances typically; the journey loops back from next-stage", () => {
+    const l = resolveNext("listing");
+    assert.equal(l.kind, "typical");
+    assert.equal(l.nextStageId, "hearing");
+    const n = resolveNext("next-stage");
+    assert.equal(n.kind, "typical");
+    assert.equal(n.nextStageId, "listing");
+  });
+
   it("weak evidence → uncertain", () => {
     const r = resolveNext("hearing", { weak: true });
     assert.equal(r.kind, "uncertain");

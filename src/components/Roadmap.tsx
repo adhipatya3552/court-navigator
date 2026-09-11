@@ -48,6 +48,10 @@ export default function Roadmap({ stageId, setStageId }: { stageId: string; setS
               {STAGES.map((s, i) => {
                 const done = i < activeIdx;
                 const isActive = i === activeIdx;
+                // Stage 7 is not a court event but the loop-back: after tasks,
+                // the journey returns to Listing. Render it distinctly so the
+                // line never reads as "step 7 of 7, then backwards".
+                const isLoop = s.id === "next-stage";
                 return (
                   <motion.button
                     key={s.id}
@@ -57,22 +61,39 @@ export default function Roadmap({ stageId, setStageId }: { stageId: string; setS
                     transition={{ duration: 0.5, delay: i * 0.07 }}
                     onClick={() => setStageId(s.id)}
                     className={`relative flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-300 hover:-translate-y-0.5 ${
-                      isActive
+                      isLoop
+                        ? "border-dashed border-[#7ef0dd]/45 bg-[#7ef0dd]/[0.05] hover:border-[#7ef0dd]/70 hover:bg-[#7ef0dd]/[0.09]"
+                        : ""
+                    } ${
+                      !isLoop && isActive
                         ? "border-[#C9A227]/70 bg-[#C9A227]/10 shadow-[0_16px_50px_rgba(201,162,39,0.25)]"
-                        : "border-white/10 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.06]"
+                        : !isLoop
+                          ? "border-white/10 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.06]"
+                          : ""
                     }`}
                     style={{ transformPerspective: 800 }}
                   >
                     <span
                       className={`z-10 grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-[15px] font-black transition ${
-                        isActive ? "bg-[#C9A227] text-[#0a0f22]" : done ? "bg-emerald-400 text-[#06281f]" : "bg-white/10 text-white/60"
+                        isLoop
+                          ? "bg-[#7ef0dd]/15 text-[#b8fff4]"
+                          : isActive
+                            ? "bg-[#C9A227] text-[#0a0f22]"
+                            : done
+                              ? "bg-emerald-400 text-[#06281f]"
+                              : "bg-white/10 text-white/60"
                       }`}
                     >
-                      {done ? "✓" : s.order}
+                      {isLoop ? "↻" : done ? "✓" : s.order}
                     </span>
                     <span>
                       <span className="block text-[15px] font-bold">{lang === "en" ? s.titleEn : s.titleHi}</span>
                       <span className="block text-[12.5px] text-white/55">{lang === "en" ? s.taglineEn : s.taglineHi}</span>
+                      {isLoop && (
+                        <span className="mt-1 inline-block rounded-full bg-[#7ef0dd]/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[#b8fff4]">
+                          {lang === "en" ? "loops back to Listing" : "लिस्टिंग पर वापसी"}
+                        </span>
+                      )}
                     </span>
                     {isActive && (
                       <span className="ml-auto shrink-0 rounded-full bg-[#C9A227] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#0a0f22]">
@@ -83,6 +104,11 @@ export default function Roadmap({ stageId, setStageId }: { stageId: string; setS
                 );
               })}
             </div>
+            <p className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-3.5 text-[12.5px] leading-relaxed text-white/55">
+              {lang === "en"
+                ? "Court matters loop: listing → hearing → order → tasks → next listing, until the matter concludes. There is no final step — only the next date."
+                : "न्यायालयीन मामले चक्र में चलते हैं: लिस्टिंग → सुनवाई → आदेश → कार्य → अगली लिस्टिंग, जब तक मामला पूर्ण न हो। कोई अंतिम चरण नहीं — केवल अगली तारीख।"}
+            </p>
           </div>
 
           <motion.div

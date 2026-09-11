@@ -34,13 +34,34 @@ describe("decodeDocument", () => {
     assert.equal(out.mappedStageId, "listing");
   });
 
-  it("marks defect language as scrutiny", () => {
+  it("classifies defect language as scrutiny", () => {
     const out = decodeDocument(
       "Registry objection: the filing has a defect. Remove the defect and re-file the bail application papers at the counter."
     );
     assert.ok(!("error" in out));
     if ("error" in out) return;
     assert.equal(out.mappedStageId, "scrutiny");
+  });
+
+  it("does not mistake “no objection” for a registry objection", () => {
+    const out = decodeDocument(
+      "In the Court of the District & Sessions Court, Sample District (M.P.). ORDER. The learned counsel for the State has no objection to the prayer. The application is allowed with a bond of fifty thousand rupees and conditions to be complied before the next date."
+    );
+    assert.ok(!("error" in out));
+    if ("error" in out) return;
+    assert.equal(out.docType, "order");
+    assert.equal(out.mappedStageId, "order");
+    assert.ok(!out.signalsEn.some((s) => /scrutiny/i.test(s)), `false defect signal: ${out.signalsEn}`);
+  });
+
+  it("detects orders structurally without a bare ORDER line", () => {
+    const out = decodeDocument(
+      "IN THE HIGH COURT OF MADHYA PRADESH AT JABALPUR. BEFORE THE HON'BLE SHRI JUSTICE. MISC. CRIMINAL CASE No. 50247 of 2025. The application for anticipatory bail is withdrawn, with no objections pressed by the parties."
+    );
+    assert.ok(!("error" in out));
+    if ("error" in out) return;
+    assert.equal(out.docType, "order", `expected structural order, signals: ${out.signalsEn}`);
+    assert.equal(out.mappedStageId, "order");
   });
 
   it("stays uncertain on vague text", () => {

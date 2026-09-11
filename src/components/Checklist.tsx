@@ -52,7 +52,6 @@ export default function Checklist({ stageId }: { stageId: string }) {
         <div className="mt-8 space-y-8">
           {STAGES.map((s) => {
             const items = CHECKLIST.filter((c) => c.stageId === s.id);
-            if (items.length === 0) return null;
             const isCurrent = s.id === stageId;
             const stageDone = items.filter((i) => done.has(i.id)).length;
             return (
@@ -78,6 +77,22 @@ export default function Checklist({ stageId }: { stageId: string }) {
                   </span>
                 </div>
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  {items.length === 0 && (
+                    <div className="rounded-2xl border border-dashed border-[#101828]/25 bg-white/60 p-5 md:col-span-2">
+                      <p className="text-[14px] font-bold text-[#101828]/70">
+                        {lang === "en" ? "No checklist items seeded for this stage." : "इस चरण हेतु कोई जांच-सूची बिंदु नहीं।"}
+                      </p>
+                      <p className="mt-1 text-[13px] leading-relaxed text-[#101828]/55">
+                        {lang === "en"
+                          ? "Registry completeness checks vary by court — nothing is asserted without a source. Verify what applies at the filing counter/registry."
+                          : "रजिस्ट्री पूर्णता-जांच न्यायालय अनुसार भिन्न है — स्रोत के बिना कुछ नहीं कहा जाता। प्रासंगिक बातें फ़ाइलिंग काउंटर/रजिस्ट्री से पुष्ट करें।"}
+                      </p>
+                      <span className="mt-2 inline-flex items-center gap-2">
+                        <VerifyBadge status="needs-verification" />
+                        <span className="rounded-full bg-[#101828]/5 px-2.5 py-1 text-[10.5px] font-bold text-[#101828]/55">MP District Courts</span>
+                      </span>
+                    </div>
+                  )}
                   {items.map((c, i) => {
                     const checked = done.has(c.id);
                     return (

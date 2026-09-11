@@ -12,6 +12,10 @@ export default function NextStep({ stageId, setStageId }: { stageId: string; set
   const cur = STAGES[idx];
   const res = resolveNext(stageId);
   const goTarget = res.nextStageId ?? STAGES[Math.min(idx + 1, STAGES.length - 1)].id;
+  // Wrap-around: the next step sits EARLIER on the line (the loop restarts).
+  // Say so explicitly instead of a bare "Go to" that reads as going backwards.
+  const nextIdx = STAGES.findIndex((s) => s.id === goTarget);
+  const isWrap = nextIdx >= 0 && nextIdx < idx;
   const prep = CHECKLIST.filter((c) => c.stageId === cur.id).slice(0, 3);
   const terms = cur.termIds.map((id) => GLOSSARY.find((g) => g.id === id)).filter(Boolean);
 
@@ -45,10 +49,23 @@ export default function NextStep({ stageId, setStageId }: { stageId: string; set
                   disabled={!res.nextStageId}
                   className="group flex items-center gap-2 rounded-2xl bg-[#C9A227] px-5 py-3 text-[13.5px] font-bold text-[#0a0f22] transition hover:-translate-y-0.5 hover:brightness-110 disabled:opacity-40"
                 >
-                  {lang === "en" ? `Go to: ${stageName(goTarget, "en")}` : `जाएं: ${stageName(goTarget, "hi")}`}
+                  {isWrap
+                    ? lang === "en"
+                      ? `Back to ${stageName(goTarget, "en")} — watch for your next date`
+                      : `${stageName(goTarget, "hi")} पर वापसी — अगली तारीख देखें`
+                    : lang === "en"
+                      ? `Go to: ${stageName(goTarget, "en")}`
+                      : `जाएं: ${stageName(goTarget, "hi")}`}
                   <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
                 </button>
               </div>
+              {isWrap && (
+                <p className="mt-3 text-[12.5px] leading-relaxed text-white/55">
+                  {lang === "en"
+                    ? "Why backwards? Tasks done means waiting for the next hearing — so the journey restarts at Listing. This loop repeats until the matter concludes."
+                    : "पीछे क्यों? कार्य पूर्ण यानी अगली सुनवाई की प्रतीक्षा — इसलिए यात्रा लिस्टिंग से पुनः शुरू होती है। मामला पूर्ण होने तक यह चक्र दोहराता है।"}
+                </p>
+              )}
               {res.alternatives.length > 0 && (
                 <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
                   <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-white/45">
