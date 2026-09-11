@@ -14,6 +14,7 @@ Everything else is explicitly marked *Coming Soon* and never answered as if veri
 - **What happens next** — I AM HERE → NEXT (branch badge + reason) + prepare + terms + watch-for + alternatives.
 - **Structured assistant** — corpus-grounded answers with source labels (AI/offline/guardrail); refuses outcome/strategy questions with a redirect.
 - **Try a Sample Case** — one click in Court Setup decodes the demo order end-to-end.
+- **Onboarding + Help + FAQ** — 4-step first-visit walkthrough (remembered, reopenable), floating “?” contextual help, 8-question EN/HI accordion before Scope.
 - **EN/हिंदी toggle**, smooth scrolling (Lenis), 3D hero (react-three-fiber), scroll animations (framer-motion), responsive + loading/error/empty states.
 
 ## What it does NOT do

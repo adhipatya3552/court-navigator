@@ -98,7 +98,16 @@ export default function NextStep({ stageId, setStageId }: { stageId: string; set
                   <Ear size={17} className="mt-0.5 shrink-0 text-[#7ef0dd]" />
                   <div>
                     <p className="text-[11px] font-bold uppercase tracking-widest text-white/45">You may hear</p>
-                    <p className="mt-1 text-[13px] text-white/80">{terms.map((x) => x!.term).join(" · ")}</p>
+                    <p className="mt-1.5 flex flex-wrap gap-x-1.5 gap-y-1 text-[13px] text-white/80">
+                      {terms.map((x, i) => (
+                        <span key={x!.id}>
+                          <a href={`#glossary-${x!.id}`} className="text-[#7ef0dd] hover:underline" title={lang === "en" ? "What does this mean? — open glossary" : "इसका अर्थ? — glossary खोलें"}>
+                            {x!.term}
+                          </a>
+                          {i < terms.length - 1 && <span className="text-white/35"> · </span>}
+                        </span>
+                      ))}
+                    </p>
                   </div>
                 </div>
                 <div className="flex gap-3 rounded-2xl bg-white/[0.05] p-4">

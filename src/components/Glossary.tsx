@@ -36,11 +36,12 @@ export default function Glossary() {
           {results.map((g, i) => (
             <motion.div
               key={g.id}
+              id={`glossary-${g.id}`}
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: Math.min(i * 0.04, 0.3) }}
-              className="group rounded-2xl border border-[#101828]/10 bg-[#FAF8F3] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#C9A227]/60 hover:shadow-xl"
+              className="group scroll-mt-24 rounded-2xl border border-[#101828]/10 bg-[#FAF8F3] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#C9A227]/60 hover:shadow-xl"
               style={{ transformPerspective: 700 }}
             >
               <div className="flex items-start justify-between gap-2">

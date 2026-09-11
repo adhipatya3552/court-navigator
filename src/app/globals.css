@@ -39,3 +39,29 @@ body {
   background: linear-gradient(#c9a227, #0e4d4a);
   border-radius: 8px;
 }
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 3px solid #0e4d4a;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.dark-focus:focus-visible,
+.bg-\[\#0b1226\] :focus-visible,
+.bg-\[\#070b18\] :focus-visible {
+  outline-color: #f3d67a;
+}
+
+/* Respect reduced motion: kill smooth-scroll + decorative animation */
+@media (prefers-reduced-motion: reduce) {
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

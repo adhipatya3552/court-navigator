@@ -2,8 +2,12 @@
 
 import { motion } from "framer-motion";
 import { STAGES, SUPPORTED_SCOPE } from "@/lib/data";
+import { SHORTCUTS } from "@/lib/help";
+import { openOnboarding } from "@/lib/onboard";
 import { useLang } from "@/lib/i18n";
-import { Check, Lock, PlayCircle } from "lucide-react";
+import { Check, Lock, PlayCircle, Info, Compass, FileScan, BookOpen, CircleHelp } from "lucide-react";
+
+const SHORTCUT_ICONS = [Compass, FileScan, BookOpen, CircleHelp];
 
 export default function JourneySetup({
   stageId,
@@ -53,8 +57,49 @@ export default function JourneySetup({
           {row("Court", SUPPORTED_SCOPE.courtEn, SUPPORTED_SCOPE.courtHi)}
           {row("Matter", SUPPORTED_SCOPE.matterEn, SUPPORTED_SCOPE.matterHi)}
         </div>
+
+        <div className="mt-8">
+          <p className="text-[13px] font-black uppercase tracking-[0.16em] text-[#101828]/55">{t("shortcuts.title")}</p>
+          <p className="mt-1 text-[13px] text-[#101828]/55">{t("shortcuts.sub")}</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {SHORTCUTS.map((s, i) => {
+              const Icon = SHORTCUT_ICONS[i % SHORTCUT_ICONS.length];
+              const inner = (
+                <>
+                  <Icon size={18} className="shrink-0 text-[#0E4D4A]" />
+                  <span>
+                    <span className="block text-[14px] font-bold text-[#101828]">{lang === "en" ? s.labelEn : s.labelHi}</span>
+                    <span className="block text-[12px] text-[#101828]/55">{lang === "en" ? s.descEn : s.descHi}</span>
+                  </span>
+                </>
+              );
+              const cls =
+                "flex items-center gap-3 rounded-2xl border border-[#101828]/10 bg-white p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#0E4D4A]/45 hover:shadow-lg";
+              return s.target === "onboarding" ? (
+                <button key={s.id} onClick={openOnboarding} className={cls}>
+                  {inner}
+                </button>
+              ) : (
+                <a key={s.id} href={s.target} className={cls}>
+                  {inner}
+                </a>
+              );
+            })}
+          </div>
+        </div>
         <div className="mt-4 grid gap-4 rounded-3xl border border-[#101828]/10 bg-white p-5 shadow-sm sm:grid-cols-2">
-          <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#0E4D4A] sm:col-span-2">Current stage · वर्तमान चरण</div>
+          <div className="sm:col-span-2">
+            <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#0E4D4A]">Current stage · वर्तमान चरण</div>
+            <p className="mt-1.5 flex items-start gap-1.5 text-[12.5px] leading-relaxed text-[#101828]/60">
+              <Info size={14} className="mt-0.5 shrink-0 text-[#0E4D4A]" />
+              <span>
+                {t("stage.helper")}{" "}
+                <a href="#decoder" className="font-bold text-[#0E4D4A] underline decoration-[#0E4D4A]/30 underline-offset-2 hover:decoration-[#0E4D4A]">
+                  {lang === "en" ? "Open the decoder →" : "decoder खोलें →"}
+                </a>
+              </span>
+            </p>
+          </div>
           {STAGES.map((s, i) => {
             const active = s.id === stageId;
             return (

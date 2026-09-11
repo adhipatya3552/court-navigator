@@ -221,41 +221,9 @@ export default function Decoder({ onStageFound, demoNonce }: { onStageFound: (id
                     {lang === "en" ? result.scopeNoteEn : result.scopeNoteHi}
                   </div>
                 )}
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl bg-white/[0.05] p-4">
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-white/45">Dates found</p>
-                    <p className="mt-1.5 text-[13.5px] text-white/80">{result.dates.length ? result.dates.join(" · ") : "— none extracted"}</p>
-                  </div>
-                  <div className="rounded-2xl bg-white/[0.05] p-4">
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-white/45">Case refs found</p>
-                    <p className="mt-1.5 text-[13.5px] text-white/80">{result.caseRefs.length ? result.caseRefs.join(" · ") : "— none extracted"}</p>
-                  </div>
-                </div>
-                {result.termsFound.length > 0 && (
-                  <div className="rounded-2xl bg-white/[0.05] p-4">
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-white/45">Terms detected</p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {result.termsFound.map((term) => {
-                        const g = GLOSSARY.find((x) => x.id === term.id);
-                        return (
-                          <span key={term.id} title={g ? (lang === "en" ? g.simpleEn : g.simpleHi) : ""} className="cursor-help rounded-full border border-[#7ef0dd]/30 bg-[#7ef0dd]/10 px-3 py-1.5 text-[12px] font-semibold text-[#b8fff4]">
-                            {term.term}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-                <div className="rounded-2xl border border-[#C9A227]/30 bg-[#C9A227]/8 p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#f3d67a]">What appears to happen next</p>
-                  <p className="mt-1.5 text-[13.5px] text-white/85">{lang === "en" ? result.nextEn : result.nextHi}</p>
-                  <a href="#checklist" className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-[12px] font-bold text-white transition hover:bg-white/20">
-                    <ListChecks size={13} /> Checklist updated for this stage ↓
-                  </a>
-                </div>
                 <div className="rounded-2xl border border-[#7ef0dd]/25 bg-[#7ef0dd]/[0.06] p-4">
                   <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#b8fff4]">
-                    <Sparkles size={13} /> AI plain-language explanation
+                    <Sparkles size={13} /> {lang === "en" ? "What does it mean?" : "इसका अर्थ क्या है?"}
                   </p>
                   {aiBusy && <p className="mt-1.5 animate-pulse text-[13px] text-white/55">Asking the model (grounded in the extraction above)…</p>}
                   {ai && (
@@ -267,6 +235,48 @@ export default function Decoder({ onStageFound, demoNonce }: { onStageFound: (id
                   {!aiBusy && !ai && aiOffline && (
                     <p className="mt-1.5 text-[12.5px] text-white/50">AI unavailable (offline path) — the deterministic explanation above is the complete result.</p>
                   )}
+                </div>
+                <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                  <summary className="cursor-pointer text-[11px] font-bold uppercase tracking-widest text-white/45 transition hover:text-white/70">
+                    {lang === "en" ? "Extraction details" : "निष्कर्षण विवरण"}
+                  </summary>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl bg-white/[0.05] p-4">
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-white/45">Dates found</p>
+                      <p className="mt-1.5 text-[13.5px] text-white/80">{result.dates.length ? result.dates.join(" · ") : "— none extracted"}</p>
+                    </div>
+                    <div className="rounded-2xl bg-white/[0.05] p-4">
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-white/45">Case refs found</p>
+                      <p className="mt-1.5 text-[13.5px] text-white/80">{result.caseRefs.length ? result.caseRefs.join(" · ") : "— none extracted"}</p>
+                    </div>
+                  </div>
+                  {result.termsFound.length > 0 && (
+                    <div className="mt-3 rounded-2xl bg-white/[0.05] p-4">
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-white/45">Terms detected</p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {result.termsFound.map((term) => {
+                          const g = GLOSSARY.find((x) => x.id === term.id);
+                          return (
+                            <a
+                              key={term.id}
+                              href={`#glossary-${term.id}`}
+                              title={`${g ? (lang === "en" ? g.simpleEn : g.simpleHi) : ""} — ${lang === "en" ? "open in glossary" : "glossary में खोलें"}`}
+                              className="rounded-full border border-[#7ef0dd]/30 bg-[#7ef0dd]/10 px-3 py-1.5 text-[12px] font-semibold text-[#b8fff4] transition hover:border-[#7ef0dd]/60 hover:bg-[#7ef0dd]/20"
+                            >
+                              {term.term} →
+                            </a>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </details>
+                <div className="rounded-2xl border border-[#C9A227]/30 bg-[#C9A227]/8 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#f3d67a]">What appears to happen next</p>
+                  <p className="mt-1.5 text-[13.5px] text-white/85">{lang === "en" ? result.nextEn : result.nextHi}</p>
+                  <a href="#checklist" className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-[12px] font-bold text-white transition hover:bg-white/20">
+                    <ListChecks size={13} /> Checklist updated for this stage ↓
+                  </a>
                 </div>
                 <div className="rounded-2xl border border-white/10 p-4">
                   <p className="text-[11px] font-bold uppercase tracking-widest text-white/45">Cannot safely be inferred</p>

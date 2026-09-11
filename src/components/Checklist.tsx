@@ -11,9 +11,15 @@ export default function Checklist({ stageId }: { stageId: string }) {
   const { lang, t } = useLang();
   const [done, setDone] = useState<Set<string>>(new Set(["c-prep-1"]));
   const [filter, setFilter] = useState<string>("current");
+  const [expanded, setExpanded] = useState(false);
 
-  const items = useMemo(() => (filter === "current" ? CHECKLIST.filter((c) => c.stageId === stageId) : CHECKLIST), [filter, stageId]);
-  const pct = items.length === 0 ? 0 : Math.round((items.filter((i) => done.has(i.id)).length / items.length) * 100);
+  const allItems = useMemo(() => (filter === "current" ? CHECKLIST.filter((c) => c.stageId === stageId) : CHECKLIST), [filter, stageId]);
+  // Progressive disclosure: top 3 first ("what should I do now?"), rest on expand.
+  const items = useMemo(
+    () => (filter === "current" && !expanded ? allItems.slice(0, 3) : allItems),
+    [filter, expanded, allItems]
+  );
+  const pct = allItems.length === 0 ? 0 : Math.round((allItems.filter((i) => done.has(i.id)).length / allItems.length) * 100);
   const stage = STAGES.find((s) => s.id === stageId);
 
   return (
@@ -37,17 +43,28 @@ export default function Checklist({ stageId }: { stageId: string }) {
               </svg>
             </span>
             <span className="text-[13px] font-semibold text-[#101828]/70">
-              {done.size} of {items.length} done
+              {allItems.filter((i) => done.has(i.id)).length} of {allItems.length} done
             </span>
           </div>
           <div className="flex rounded-full border border-[#101828]/10 bg-white p-1 text-[13px] font-semibold">
             {(["current", "all"] as const).map((f) => (
-              <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-4 py-2 transition ${filter === f ? "bg-[#101828] text-white" : "text-[#101828]/60 hover:text-[#101828]"}`}>
+              <button
+                key={f}
+                onClick={() => {
+                  setFilter(f);
+                  setExpanded(false);
+                }}
+                className={`rounded-full px-4 py-2 transition ${filter === f ? "bg-[#101828] text-white" : "text-[#101828]/60 hover:text-[#101828]"}`}
+              >
                 {f === "current" ? "This stage" : "All stages"}
               </button>
             ))}
           </div>
         </div>
+
+        {filter === "current" && (
+          <p className="mt-6 text-[13px] font-black uppercase tracking-[0.16em] text-[#0E4D4A]">{t("checklist.now")}</p>
+        )}
 
         <div className="mt-6 grid gap-3 md:grid-cols-2">
           {items.map((c, i) => {
@@ -89,6 +106,15 @@ export default function Checklist({ stageId }: { stageId: string }) {
         <p className="mt-5 flex items-center gap-2 text-[12.5px] text-[#101828]/55">
           <ListChecks size={14} /> Never invent a checklist item. Items flagged “Needs verification” must be confirmed with the court / registry.
         </p>
+        {filter === "current" && allItems.length > 3 && (
+          <button
+            onClick={() => setExpanded((e) => !e)}
+            aria-expanded={expanded}
+            className="mt-4 w-full rounded-2xl border border-dashed border-[#0E4D4A]/35 bg-white px-5 py-3.5 text-[14px] font-bold text-[#0E4D4A] transition hover:border-[#0E4D4A]/60 hover:bg-[#0E4D4A]/5"
+          >
+            {expanded ? t("checklist.less") : `${t("checklist.more")} (${allItems.length - 3} ${lang === "en" ? "more" : "और"})`}
+          </button>
+        )}
       </div>
     </section>
   );

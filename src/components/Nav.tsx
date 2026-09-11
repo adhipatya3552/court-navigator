@@ -30,6 +30,7 @@ export default function Nav() {
             ["#glossary", "Glossary"],
             ["#decoder", "Decoder"],
             ["#next", "Next"],
+            ["#faq", "FAQ"],
           ].map(([href, label]) => (
             <a key={href} href={href} className="rounded-full px-3.5 py-2 transition hover:bg-white/10 hover:text-white">
               {label}

@@ -1,10 +1,11 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, FileScan, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, FileScan, ShieldCheck, Sparkles, CircleHelp } from "lucide-react";
 import { useRef } from "react";
 import Scene3D from "./Scene3D";
 import { useLang } from "@/lib/i18n";
+import { openOnboarding } from "@/lib/onboard";
 
 export default function Hero() {
   const { t } = useLang();
@@ -75,6 +76,16 @@ export default function Hero() {
           <span className="flex items-center gap-1.5">
             <ShieldCheck size={14} className="text-[#7ef0dd]" />
             {t("hero.note")}
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="text-white/45">{t("hero.firstTime")}</span>
+            <button
+              onClick={openOnboarding}
+              className="flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 font-semibold text-white transition hover:border-[#C9A227]/60 hover:text-[#f3d67a]"
+            >
+              <CircleHelp size={13} />
+              {t("hero.howItWorks")}
+            </button>
           </span>
         </motion.div>
         <motion.div

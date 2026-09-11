@@ -1,6 +1,6 @@
 # DEMO_SCRIPT.md — 2–3 minute judge demo
 
-**Setup:** `npm run dev` → http://localhost:3000. Language toggle EN/हिंदी top-right. Start at top.
+**Setup:** `npm run dev` → http://localhost:3000. Fresh profile (clear `cn-onboarded-v1` in localStorage) shows the 4-step “How Court Navigator works” walkthrough once. Language toggle EN/हिंदी top-right. Floating **?** reopens help anytime. Start at top.
 
 ## 0:00–0:20 — The idea (Hero)
 
@@ -27,7 +27,8 @@ Scroll slightly — 3D scales-of-justice motif + pillars parallax behind the hea
 ## 2:20–2:50 — Trust close
 
 8. Assistant: ask “Will I win?” → refusal redirect. Ask “What does listing mean?” → sourced glossary answer.
-9. Scope section: Supported vs Coming Soon + 7 official sources. Close: *“AI explains. Sources establish. Rules structure. Humans decide.”*
+9. FAQ (before Scope): 8 pre-use questions, EN/HI accordion — point at “Is this legal advice? No.”
+10. Scope section: Supported vs Coming Soon + 7 official sources. Close: *“AI explains. Sources establish. Rules structure. Humans decide.”*
 
 ## Fallbacks (if anything stalls)
 
