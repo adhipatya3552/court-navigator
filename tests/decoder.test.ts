@@ -103,6 +103,15 @@ describe("real High Court anticipatory-bail order (fixture)", () => {
       assert.equal(out.scopeNoteEn, "");
     }
   });
+
+  it("marks the decisive stage signal (last rule wins, stays visible)", () => {
+    const out = decodeDocument(ORDER);
+    assert.ok(!("error" in out));
+    if ("error" in out) return;
+    assert.ok(out.decisiveEn.length > 0);
+    assert.ok(out.signalsEn.includes(out.decisiveEn), "decisive signal must survive the display cap");
+    assert.match(out.decisiveEn, /list the matter/i);
+  });
 });
 
 describe("assistantReply", () => {

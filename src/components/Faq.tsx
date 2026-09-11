@@ -19,7 +19,7 @@ export default function Faq() {
           transition={{ duration: 0.7 }}
           className="text-center"
         >
-          <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#0E4D4A]">10 · FAQ</p>
+          <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#0E4D4A]">09 · FAQ</p>
           <h2 className="mt-3 font-serif text-4xl font-black tracking-tight text-[#101828] sm:text-5xl">{t("faq.title")}</h2>
           <p className="mx-auto mt-3 max-w-xl text-[14px] text-[#101828]/60">{t("faq.sub")}</p>
         </motion.div>

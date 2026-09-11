@@ -15,6 +15,9 @@ export interface DecodedDoc {
   /** Visible evidence: why this type / stage was chosen. Never chain-of-thought. */
   signalsEn: string[];
   signalsHi: string[];
+  /** The stage-mapping signal that decided the outcome (may be empty). */
+  decisiveEn: string;
+  decisiveHi: string;
   /** Non-empty when the document falls outside the V1 journey (e.g. High Court). */
   scopeNoteEn: string;
   scopeNoteHi: string;
@@ -88,10 +91,15 @@ export function decodeDocument(rawText: string): DecodedDoc | { error: string } 
 
   // Map to journey stage using deterministic keyword logic (no model inference of law).
   // Each rule appends its evidence so the UI can show "why this stage".
+  // The LAST stage rule to fire is decisive; earlier ones are superseded (but kept visible for honesty).
   let mappedStageId = "order";
+  let decisiveEn = "";
+  let decisiveHi = "";
   const mapSignal = (en: string, hi: string) => {
     signalsEn.push(en);
     signalsHi.push(hi);
+    decisiveEn = en;
+    decisiveHi = hi;
   };
   if (docType === "notice" || docType === "summons") {
     mappedStageId = "listing";
@@ -180,6 +188,13 @@ export function decodeDocument(rawText: string): DecodedDoc | { error: string } 
   unknownsEn.push("This explanation is based only on the pasted text, not the full case record or court discretion.");
   unknownsHi.push("यह व्याख्या केवल दिए गए पाठ पर आधारित है — पूर्ण रिकॉर्ड या न्यायालयीन विवेक पर नहीं।");
 
+  // Guarantee the decisive signal survives the display cap.
+  const cap = (signals: string[], decisive: string) => {
+    const cut = signals.slice(0, 8);
+    if (decisive && !cut.includes(decisive)) cut[Math.max(cut.length - 1, 0)] = decisive;
+    return cut;
+  };
+
   return {
     docType,
     docTypeConfidence: conf,
@@ -192,8 +207,10 @@ export function decodeDocument(rawText: string): DecodedDoc | { error: string } 
     partiesNoteHi: "V1 में पक्षकार स्वतः पहचाने नहीं जाते ताकि गलत नामन से बचा जा सके। नाम दस्तावेज़ पर छपे अनुसार जांचें।",
     termsFound,
     mappedStageId,
-    signalsEn: signalsEn.slice(0, 8),
-    signalsHi: signalsHi.slice(0, 8),
+    signalsEn: cap(signalsEn, decisiveEn),
+    signalsHi: cap(signalsHi, decisiveHi),
+    decisiveEn,
+    decisiveHi,
     scopeNoteEn,
     scopeNoteHi,
     nextEn: stage.nextEn,

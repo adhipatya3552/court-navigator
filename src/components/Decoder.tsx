@@ -195,7 +195,13 @@ export default function Decoder({ onStageFound, demoNonce }: { onStageFound: (id
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-300/15 px-3 py-1.5 text-[11.5px] font-bold text-emerald-200">
                     <BadgeCheck size={13} /> Appears to be: {result.docType} · {result.docTypeConfidence} signal
                   </span>
-                  <span className="rounded-full bg-[#C9A227]/15 px-3 py-1.5 text-[11.5px] font-bold text-[#f3d67a]">Maps to journey stage → {result.mappedStageId}</span>
+                  <span className="rounded-full bg-[#C9A227]/15 px-3 py-1.5 text-[11.5px] font-bold text-[#f3d67a]">
+                    {lang === "en" ? "Maps to journey stage → " : "यात्रा-चरण → "}
+                    {(() => {
+                      const st = STAGES.find((s) => s.id === result.mappedStageId);
+                      return st ? (lang === "en" ? st.titleEn : st.titleHi) : result.mappedStageId;
+                    })()}
+                  </span>
                 </div>
                 {(lang === "en" ? result.signalsEn : result.signalsHi).length > 0 && (
                   <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
@@ -203,9 +209,22 @@ export default function Decoder({ onStageFound, demoNonce }: { onStageFound: (id
                       <Eye size={13} /> Why this mapping?
                     </p>
                     <ul className="mt-1.5 space-y-1">
-                      {(lang === "en" ? result.signalsEn : result.signalsHi).map((s) => (
-                        <li key={s} className="text-[12.5px] text-white/60">• {s}</li>
-                      ))}
+                      {(lang === "en" ? result.signalsEn : result.signalsHi).map((s) => {
+                        const decisive = s === (lang === "en" ? result.decisiveEn : result.decisiveHi) && result.decisiveEn !== "";
+                        return (
+                          <li key={s} className={`flex gap-1.5 text-[12.5px] ${decisive ? "font-semibold text-[#b8fff4]" : "text-white/45"}`}>
+                            <span aria-hidden>{decisive ? "✓" : "•"}</span>
+                            <span>
+                              {s}
+                              {decisive && (
+                                <span className="ml-1.5 rounded-full bg-[#7ef0dd]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#b8fff4]">
+                                  {lang === "en" ? "deciding signal" : "निर्णायक संकेत"}
+                                </span>
+                              )}
+                            </span>
+                          </li>
+                        );
+                      })}
                     </ul>
                     {struct && (
                       <p className="mt-2 text-[12px] text-[#b8fff4]">

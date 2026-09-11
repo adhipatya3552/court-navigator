@@ -37,10 +37,10 @@ export default function Page() {
         <Hero />
         <div className="border-y border-[#101828]/10 bg-white">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-8 gap-y-2 px-4 py-4 text-[12.5px] font-semibold text-[#101828]/60 sm:px-6">
-            <span>01 · Land → <b className="text-[#101828]">Start Court Navigation</b></span>
-            <span>02 · Setup → <b className="text-[#101828]">MP · District · Criminal · Bail</b></span>
-            <span>03 · Roadmap → <b className="text-[#101828]">You are here</b></span>
-            <span>04 · Decoder → <b className="text-[#101828]">What happens next?</b></span>
+            <span>Land → <b className="text-[#101828]">Start Court Navigation</b></span>
+            <span>Setup → <b className="text-[#101828]">MP · District · Criminal · Bail</b></span>
+            <span>Roadmap → <b className="text-[#101828]">You are here</b></span>
+            <span>Decoder → <b className="text-[#101828]">What happens next?</b></span>
           </div>
         </div>
         <JourneySetup stageId={stageId} setStageId={setStageId} onSampleCase={runSampleCase} />

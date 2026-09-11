@@ -21,7 +21,7 @@ export default function Assistant() {
   const shown = log.map((m) => {
     if (m.a) return m;
     const r = assistantReply(m.q);
-    return { ...m, a: lang === "en" ? r.en : r.hi, via: "offline corpus" };
+    return { ...m, a: lang === "en" ? r.en : r.hi, via: lang === "en" ? "Instant answer · verified corpus" : "तुरंत उत्तर · सत्यापित संग्रह" };
   });
 
   const ask = (text: string) => {
@@ -57,7 +57,7 @@ export default function Assistant() {
           if (r) n[i] = { q: query, a: r.text, via: `AI · ${r.provider}` };
           else {
             const d = assistantReply(query);
-            n[i] = { q: query, a: lang === "en" ? d.en : d.hi, via: "offline corpus" };
+            n[i] = { q: query, a: lang === "en" ? d.en : d.hi, via: lang === "en" ? "Offline path · verified corpus" : "ऑफ़लाइन पथ · सत्यापित संग्रह" };
           }
         }
         return n;

@@ -5,7 +5,7 @@ Only primary / official sources are used as authorities. Third-party blogs, SEO 
 | ID | Title | Authority | URL | Jurisdiction | What it may support | Status |
 |---|---|---|---|---|---|---|
 | ecourts-services | eCourts Services Portal | eCommittee, Supreme Court of India / NIC | https://services.ecourts.gov.in | India — general | Case-status / cause-list lookup guidance | General guidance |
-| ecourts-manual | eCourts Manuals & User Documentation | eCommittee, Supreme Court of India | https://ecourts.gov.in/ecourts_home/manuals.php | India — general | e-filing usage flow in general; MP specifics still vary | Needs verification |
+| ecourts-manual | eCourts Manuals & User Documentation | eCommittee, Supreme Court of India | https://ecourts.gov.in/ecourts_home/static/manuals.php | India — general | e-filing usage flow in general; MP specifics still vary | Needs verification |
 | sci-efiling | Supreme Court e-Filing resources | Supreme Court of India | https://www.sci.gov.in/e-filing/ | SCI only | Context only — NOT applied to District Court journey | General guidance |
 | mphc-official | MP High Court official website | High Court of Madhya Pradesh | https://mphc.gov.in | Madhya Pradesh | MP judiciary rules/notifications directory; specifics need current notification | Needs verification |
 | mp-district-ecourts | MP District Courts on eCourts | District Judiciary (M.P.) via eCourts | https://services.ecourts.gov.in/ecourtindia_v6/ | MP District Courts | Track MP district matters; filing requirements vary by registry | General guidance |

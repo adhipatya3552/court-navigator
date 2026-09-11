@@ -11,7 +11,7 @@ export default function Scope() {
     <section id="scope" className="bg-[#FAF8F3] py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7 }}>
-          <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#0E4D4A]">09 · Trust</p>
+          <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#0E4D4A]">10 · Trust</p>
           <h2 className="mt-3 font-serif text-4xl font-black tracking-tight text-[#101828] sm:text-5xl">{t("scope.title")}</h2>
         </motion.div>
         <div className="mt-10 grid gap-4 lg:grid-cols-3">

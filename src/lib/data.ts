@@ -84,7 +84,7 @@ export const SOURCES: Source[] = [
     id: "ecourts-manual",
     title: "eCourts Manuals & User Documentation (official eCourts documentation set)",
     authority: "eCommittee, Supreme Court of India",
-    url: "https://ecourts.gov.in/ecourts_home/manuals.php",
+    url: "https://ecourts.gov.in/ecourts_home/static/manuals.php",
     jurisdiction: "India — general",
     applicability: "General e-filing / eCourts usage flow. MP-registry variation still applies.",
     lastCatalogued: "2026-09-11",
